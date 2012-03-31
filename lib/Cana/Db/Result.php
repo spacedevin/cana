@@ -16,10 +16,17 @@ class Cana_Db_Result extends Cana_Iterator {
 		$this->_res = $res;
 		$this->_db = $db;
 	}
-	
+
+	// do not pass this the mysql result!
 	public function fetch($class = null, $params = []) {
+		if (!is_object($this->res())) {
+			// honestly i dont know how u would get here but it hapens in my old code (lots...)
+			debug_print_backtrace();
+			exit;
+		}
 		if ($class) {
 			return $this->res()->fetch_object($class, $params);
+
 		} else {
 			return $this->res()->fetch_object();
 		}
@@ -29,6 +36,18 @@ class Cana_Db_Result extends Cana_Iterator {
 		return $this->_db;
 	}
 	
+	public function numRows() {
+		return $this->db()->affected_rows;
+		/*
+		if (!isset($this->_num_rows)) {
+			$this->_num_rows = $this->db()->affected_rows;
+			// $num = count($this->fetch_all());
+			// $this->data_seek(0);
+		}
+		return $this->_num_rows;
+		*/
+	}
+
 	public function res() {
 		return $this->_res;
 	}
@@ -40,8 +59,9 @@ class Cana_Db_Result extends Cana_Iterator {
 			return (new ReflectionMethod(parent, $name))->invokeArgs(parent, $arguments);
 		}
 	}
-	
+
 	public function &__get($name) {
+		echo $name;
 		if (property_exists($this->res(),$name)) {
 			return $this->res()->{$name};
 		} else {

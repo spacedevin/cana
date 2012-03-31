@@ -30,7 +30,7 @@ class Cana_Db_MySQL_Db extends mysqli {
 	*/
 
 	public function query($query, $cache = true) {
-		if (1==2 && $cache && Cana::config()->cache->mysql !== false && $cached = $this->cached($query)) {
+		if ($cache && Cana::config()->cache->mysql !== false && $cached = $this->cached($query)) {
 			$result = $cached;
 			$result->res()->data_seek(0);
 
@@ -49,29 +49,15 @@ class Cana_Db_MySQL_Db extends mysqli {
 				}
 			}
 			$result = new Cana_Db_MySQL_Result($ret, $this);
+			$result->numRows();
+
 			if (Cana::config()->cache->mysql !== false) {
 				$this->queries($query, $result);
 			}
 		}
 		return $result;
 	}
-	
-	public function numRows($result) {
-		return @mysql_num_rows($result);
-	}
-	
-	public function fetch($result) {
-		return $this->fetchObject($result);
-	}
-	
-	public function fetchArray($result) {
-		return @mysql_fetch_assoc($result);
-	}
-	
-	public function fetchObject($result) {
-		return @mysql_fetch_object($result);
-	}
-	
+
 	public function escape($var) {
 		return $this->real_escape_string($var);
 	}

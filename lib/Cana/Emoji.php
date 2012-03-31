@@ -2,9 +2,6 @@
 
 /**
  * Generated emoji output
- * 
- * @author		Devin Smith <devin@cana.la>
- * @date		2006.02.01
  *
  * @author		Cal Henderson (https://github.com/iamcal/php-emoji)
  * @date		2011.03.27

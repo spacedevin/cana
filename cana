@@ -1,0 +1,248 @@
+#!/usr/bin/php
+<?php
+
+$version = '0.01';
+(new Cana_Utility)->init();
+
+
+
+class Cana_Utility {
+	public function __construct() {
+		$this->args = new Args;
+		$this->version = $GLOBALS['version'];
+		
+		$this->check();
+	}
+	
+	public function check() {
+
+		echo "Cana PHP Object Oriented Framework - Utility version ".$this->version.".\nPlease visit http://cana.la for more information.\n\n";
+
+		if (phpversion() < 5.4) {
+			$errors[] = "You don't have PHP 5.4 installed. Please upgrade your PHP and try again.\n";
+		}
+
+		if (!function_exists('readline')) {
+			$errors[] = "You dont have the readline library installed in your PHP CLI. You will have to manually install cana.\n";
+		}
+
+		if (!$this->args->flag('localinstall')) {
+			@exec('git --version 2>&1',$out);
+			if (strpos($out[0],'git version') !== 0) {
+				$errors[] = "We couldn't find git. Please install git and try again.\n";
+			}
+		}
+
+		if ($errors) {
+			foreach ($errors as $error) {
+				echo $error;
+			}
+			echo "\n";
+			exit;
+		}
+
+	}
+	
+	public function init() {
+
+		echo "Enter a command to continue. Type help for a list of commands.\n\n";
+
+		while (true) {
+			$cmd = readline('cana: ');
+			readline_add_history($cmd);
+		
+			switch ($cmd) {
+				case 'app':
+					$this->app();
+					break;
+				case 'upgrade':
+				case 'update':
+					$this->update();
+					break;
+				case 'install':
+					$this->install();
+					break;
+				case 'help':
+					$this->help();
+					break;
+				case 'exit':
+				case 'quit':
+					$this->quit();
+					break;
+			}
+		}
+
+	}
+	
+	public function app() {
+		echo "Enter the path of your base cana installation.\n";
+		$path = readline('Install path: ');
+		readline_add_history($path);
+		if (!file_exists($path) || !is_dir($path)) {
+			$path = dirname(__FILE__).'/'.$path;
+		}
+		
+		if (file_exists($path.'/include/config/cana.ini')) {
+			echo "Found your installation...booting...\n";
+			$config = parse_ini_file($path.'/include/config/cana.ini');
+			// update cana
+			require_once $path.'/include/config/../'.$config['pathboot'].'/'.$config['name'].'.php';
+			echo "Entering interactive app mode...\n";
+			
+			while (true) {
+				$appcmd = readline('cana/'.$config['name'].': ');
+				readline_add_history($appcmd);
+				eval($appcmd);				
+			}
+
+		} else {
+			echo 'Could not locate your cana.ini file in "'.$path.'/include/config/cana.ini"'."\n";
+		}
+	}
+
+	public function download($path) {
+		if ($this->args->flag('localinstall')) {
+			echo "Enter the path to your cana archive.\n";
+			$archive = readline('Archive path: ');
+			readline_add_history($archive);
+			
+			if (file_exists($archive)) {
+			
+			} else {
+				echo 'The file "'.$archive.'" does not exist'."\n";
+			}
+		} else {
+			$cmds = [
+				'rm -Rf /tmp/cana',
+				'git clone --bare git://github.com/arzynik/cana.git /tmp/cana'
+			];
+			foreach ($cmds as $cmd) {
+				exec($cmd);
+			}
+		}
+	}
+	
+	public function quit() {
+		echo "Bye!\n\n";
+		exit;
+	}
+	
+	public function help() {
+		echo "This is the help.\n\n";
+	}
+	
+	public function install() {
+
+		echo "Enter a path to install cana to.\n";
+		$path = readline('Install path: ');
+		readline_add_history($path);
+		
+		if (!file_exists($path) || !is_dir($path)) {
+			$path = dirname(__FILE__).'/'.$path;
+		}
+		
+		if (!file_exists($path)) {
+			if (!@mkdir($path)) {
+				echo "Failed to create directory!\n";
+			}
+		}
+		$c = false;
+		
+
+		if (file_exists($path) && is_dir($path)) {
+			echo "Enter a name for your project\n";
+			$name = readline('Name: ');
+			readline_add_history($name);
+
+
+			if ($c) {
+				$cmds = [
+					'rm -Rf .cana',
+					'git clone --bare git://github.com/arzynik/cana.git .cana',
+					'rm -Rf '.escapeshellarg($path).'/.git',
+					'rm -f '.escapeshellarg($path).'/.gitignore',
+					'rm -f '.escapeshellarg($path).'/.gitconfig'
+				];
+				foreach ($cmds as $cmd) {
+					exec($cmd);
+				}
+				echo "Finished creating cana!\n\n";
+			}
+
+
+
+		} else {
+			echo "Not a valid path\n";
+		}
+
+	}
+	
+	public function update() {
+		echo "Enter the path of your base cana installation.\n";
+		$path = readline('Install path: ');
+		readline_add_history($path);
+		if (!file_exists($path) || !is_dir($path)) {
+			$path = dirname(__FILE__).'/'.$path;
+		}
+		
+		if (file_exists($path.'/include/config/cana.ini')) {
+			echo "Found your installation...\n";
+			$config = parse_ini_file($path.'/include/config/cana.ini');
+			// update cana
+
+		} else {
+			echo 'Could not locate your cana.ini file in "'.$path.'/include/config/cana.ini"'."\n";
+		}
+	}
+}
+
+class Args {
+	private $flags;
+	public $args;
+
+	public function __construct() {
+		$this->flags = [];
+		$this->args  = [];
+
+		$argv = $GLOBALS['argv'];
+		array_shift($argv);
+
+		for ($i = 0; $i < count($argv); $i++) {
+			$str = $argv[$i];
+
+			// --foo
+			if (strlen($str) > 2 && substr($str, 0, 2) == '--') {
+				$str = substr($str, 2);
+				$parts = explode('=', $str);
+				$this->flags[$parts[0]] = true;
+
+				// Does not have an =, so choose the next arg as its value
+				if (count($parts) == 1 && isset($argv[$i + 1]) && preg_match('/^--?.+/', $argv[$i + 1]) == 0) {
+					$this->flags[$parts[0]] = $argv[$i + 1];
+				} elseif (count($parts) == 2) {
+					$this->flags[$parts[0]] = $parts[1];
+				}
+			} elseif (strlen($str) == 2 && $str[0] == '-') {
+				$this->flags[$str[1]] = true;
+				if (isset($argv[$i + 1]) && preg_match('/^--?.+/', $argv[$i + 1]) == 0)
+					$this->flags[$str[1]] = $argv[$i + 1];
+			} elseif (strlen($str) > 1 && $str[0] == '-') {
+				for ($j = 1; $j < strlen($str); $j++)
+					$this->flags[$str[$j]] = true;
+			}
+		}
+
+		for ($i = count($argv) - 1; $i >= 0; $i--) {
+			if (preg_match('/^--?.+/', $argv[$i]) == 0)
+				$this->args[] = $argv[$i];
+			else
+				break;
+		}
+
+		$this->args = array_reverse($this->args);
+	}
+
+	public function flag($name) {
+		return isset($this->flags[$name]) ? $this->flags[$name] : false;
+	}
+}

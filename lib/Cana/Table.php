@@ -186,7 +186,7 @@ class Cana_Table extends Cana_Model { //
 		$this->dbWrite()->query($query);
 
 		if ($newItem == 1) {
-			$this->{$this->idVar()} = $this->dbWrite()->insertId();
+			$this->{$this->idVar()} = $this->dbWrite()->insert_id;
 		}
 		return $this;
 	}

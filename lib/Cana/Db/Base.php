@@ -27,15 +27,20 @@ trait Cana_Db_Base {
 	}
 	
 	public function get($query, $class = null) {
-		$q = $this->query($query);
-		if ($q->num_rows <= 1) {
+
+		$items = [];
+		$res = $this->query($query);
+
+		if ($res->numRows() < 1) {
+
 			if ($class) {
-				$items[] = Cana::factory($q->fetch($class));
+				$items[] = Cana::factory($class,$row);
 			} else {
-				$items[] = $q->fetch($class);
+				$items[] = $row;
 			}
+
 		} else {
-			while ($row = $q->fetch($class)) {
+			while ($row = $res->fetch($class)) {
 				if ($class) {
 					$items[] = Cana::factory($class,$row);
 				} else {
