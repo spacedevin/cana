@@ -127,13 +127,13 @@ class Cana_App extends Cana_Model {
 	 * Set up the database connection
 	 */
 	public function buildDb() {
-		$this->_db = new Cana_Db ([
-			'host' => $this->_config->db->active->host,
-			'user' => $this->_config->db->active->encrypted ? $this->crypt()->decrypt($this->_config->db->active->user) : $this->_config->db->active->user,
-			'pass' => $this->_config->db->active->encrypted ? $this->crypt()->decrypt($this->_config->db->active->pass) : $this->_config->db->active->pass,
-			'db' => $this->_config->db->active->db,
-			'prefix' => (isset($this->_config->db->active->prefix) ? $this->_config->db->active->prefix : null)
-		]);
+		$connect = $this->_config->db->active;
+		if ($connect->encrypted) {
+			$connect->user = $this->crypt()->decrypt($connect->user);
+			$connect->pass = $this->crypt()->decrypt($connect->pass);
+		}
+		
+		$this->_db = new Cana_Db($connect);
 		
 		return $this;
 	}

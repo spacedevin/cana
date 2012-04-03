@@ -262,8 +262,9 @@ class Cana_Utility {
 		if (file_exists($path.$package)) {
 			$config = parse_ini_file($path.$package);
 			foreach ($config['files'] as $file) {
-				copy($path.'/include/library/Cana/'.$file, $dst.'/'.$file);
-				echo 'Copied '.$path.'/include/library/Cana/'.$file.' to '.$dst.'/'.$file."\n";
+
+				exec('cp -r '.$path.'/include/library/'.$file.' '.$dst.'/'.$file);
+				echo 'Copied '.$path.'/include/library/'.$file.' to '.$dst.'/'.$file."\n";
 			}
 		}
 	}

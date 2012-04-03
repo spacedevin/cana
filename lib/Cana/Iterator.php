@@ -217,7 +217,11 @@ class Cana_Iterator implements Iterator {
 	public function __toString() {
 		$print = '';
 		foreach ($this->_items as $key => $item) {
-			$print .= $item->__toString();
+			if (is_object($item) && method_exist($item,'__toString')) {
+				$print .= $item->__toString();
+			} elseif (is_string($item) || is_int($item)) {
+				$print .= $item;
+			}
 		}
 		return $print;
 	}

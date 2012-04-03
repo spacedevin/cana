@@ -12,12 +12,15 @@ class Cana_Db extends Cana_Model {
 	private $_type = 'MySQL';
 	private $_dbo;
 
-	public function __construct($params = array()) {
-		if (isset($params['type'])) {
-			$this->_type = $params['type'];
+	public function __construct($params) {
+		if (is_array($params)) {
+			$params = (object)$params;
+		}
+		if (isset($params->type)) {
+			$this->_type = $params->type;
 		}
 		$type = 'Cana_Db_'.$this->_type.'_Db';
-		$this->_dbo = new $type($params['host'],$params['user'],$params['pass'],$params['db']);
+		$this->_dbo = new $type($params);
 	}
 	
 	public function __call($name, $arguments = []) {

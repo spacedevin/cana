@@ -11,12 +11,13 @@
 class Cana_Db_MySQL_Db extends mysqli {
 	use Cana_Db_Base;
 
-	public function __construct($host, $user, $pass = null, $db = null) {
+	// ignore strict standards
+	public function __construct($params) {
 		if (php_sapi_name() === 'cli') {
 			ini_set('mysql.connect_timeout',10);
 			ini_set('mysqli.reconnect',1);
 		}
-		parent::__construct($host, $user, $pass, $db);
+		parent::__construct($params->host, $params->user, $params->pass, $params->db);
 	}
 
 	/*
@@ -45,7 +46,7 @@ class Cana_Db_MySQL_Db extends mysqli {
 					$this->ping();
 					return $this->query($query, $cache);
 				} else {
-					throw new Cana_Exception_Query(array('message' => $er, 'query' => $query));
+					throw new Cana_Exception_Query(['message' => $er, 'query' => $query]);
 				}
 			}
 			$result = new Cana_Db_MySQL_Result($ret, $this);
@@ -60,5 +61,9 @@ class Cana_Db_MySQL_Db extends mysqli {
 
 	public function escape($var) {
 		return $this->real_escape_string($var);
+	}
+	
+	public function insertId() {
+		return $this->insert_id;
 	}
 } 
