@@ -86,6 +86,12 @@ class Cana_Thumb extends Cana_Model {
 			$this->_format = 'jpg';
 		}
 		
+		if (isset($params['gravity'])) {
+			$this->_gravity = $params['gravity'];
+		} elseif (!isset($this->_gravity)) {
+			$this->_gravity = 'center';
+		}
+		
 		if (isset($params['quality'])) {
 			$this->_quality = intval($params['quality']);
 		} elseif (!isset($this->_quality)) {
@@ -204,7 +210,7 @@ class Cana_Thumb extends Cana_Model {
 		
 		// crop resizing
 	    if ($this->_crop) {
-	    	$cmd.= '^ -gravity center -extent '.$image['width'].'x'.$image['height'];
+	    	$cmd.= '^ -gravity '.$this->_gravity.' -extent '.$image['width'].'x'.$image['height'];
 	    }
 
 	    // rounded corners
