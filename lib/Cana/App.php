@@ -127,14 +127,13 @@ class Cana_App extends Cana_Model {
 	 * Set up the database connection
 	 */
 	public function buildDb() {
-		$this->_db = new Cana_Db (array(
-				'host' => $this->_config->db->active->host,
-				'user' => $this->_config->db->active->user,
-				'pass' => $this->_config->db->active->pass,
-				'db' => $this->_config->db->active->db,
-				'prefix' => (isset($this->_config->db->active->prefix) ? $this->_config->db->active->prefix : null)
-			)
-		);
+		$this->_db = new Cana_Db ([
+			'host' => $this->_config->db->active->host,
+			'user' => $this->_config->db->active->encrypted ? $this->crypt()->decrypt($this->_config->db->active->user) : $this->_config->db->active->user,
+			'pass' => $this->_config->db->active->encrypted ? $this->crypt()->decrypt($this->_config->db->active->pass) : $this->_config->db->active->pass,
+			'db' => $this->_config->db->active->db,
+			'prefix' => (isset($this->_config->db->active->prefix) ? $this->_config->db->active->prefix : null)
+		]);
 		
 		return $this;
 	}
@@ -244,6 +243,15 @@ class Cana_App extends Cana_Model {
 			require_once $this->_page->fileName;
 		}
 		return $this;
+	}
+	
+	
+	public function crypt($crypt = null) {
+		if (is_null($crypt)) {
+			return $this->_crypt = new Cana_Crypt(mb_convert_encoding($this->config()->crypt->key,'7bit'));
+		} else {
+			return $this->_crypt;
+		}
 	}
 	
 	
