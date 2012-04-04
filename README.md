@@ -1,7 +1,7 @@
 completely awesome & naturally amazing
 -------------------------------------------
 
-cana is an mvc php framework for rapid object oriented development. it combines existing php framework fundamentals found in frameworks such as zend, and combines it with easy to use, extended object support found in ruby, python, and jquery. cana speaks for itself.
+cana is an mvc php framework for rapid object oriented development. it combines existing php framework fundamentals found in frameworks such as zend, and combines it with easy to use, extended object support found in ruby, python, and jquery. cana's name speaks for itself.
 
 
 some cool shit you can do
