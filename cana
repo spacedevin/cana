@@ -3,7 +3,7 @@
 
 $version = '0.01';
 // be warned that this could change
-$baseRepoPath = 'git://github.com/arzynik/cana';
+$baseRepoPath = 'git://github.com/arzynik/';
 
 (new Cana_Utility)->init();
 
@@ -13,6 +13,7 @@ class Cana_Utility {
 	public function __construct() {
 		$this->args = new Args;
 		$this->version = $GLOBALS['version'];
+		$this->baseRepoPath = $GLOBALS['baseRepoPath'];
 		
 		$this->check();
 	}
@@ -225,20 +226,95 @@ class Cana_Utility {
 	}
 	
 	public function update() {
-		echo "Enter the path of your base cana installation.\n";
-		$path = readline('Install path: ');
-		readline_add_history($path);
-		if (!file_exists($path) || !is_dir($path)) {
-			$path = dirname(__FILE__).'/'.$path;
-		}
-		
-		if (file_exists($path.'/include/config/cana.ini')) {
-			echo "Found your installation...\n";
-			$config = parse_ini_file($path.'/include/config/cana.ini');
-			// update cana
-
+		if (!$this->readline) {
+			$path = $this->findPath(getcwd());
+			if (!$path) {
+				echo "Couldnt find your cana path\n";
+			}
 		} else {
-			echo 'Could not locate your cana.ini file in "'.$path.'/include/config/cana.ini"'."\n";
+			echo "Enter the path of your base cana installation.\n";
+			$path = readline('Install path: ');
+			readline_add_history($path);
+			if (!file_exists($path) || !is_dir($path)) {
+				$path = dirname(__FILE__).'/'.$path;
+			}
+			
+			if (file_exists($path.'/include/config/cana.ini')) {
+				echo "Found your installation...\n";
+				$config = parse_ini_file($path.'/include/config/cana.ini');
+				// update cana
+	
+			} else {
+				echo 'Could not locate your cana.ini file in "'.$path.'/include/config/cana.ini"'."\n";
+			}
+		}
+
+		if ($path) {
+			$extensions = [];
+			if (!$this->args->args[1] || $this->args->args[1] == 'all') {
+				// update everything
+				foreach (new DirectoryIterator($path.'/include/config/') as $fileInfo) {
+					if ($fileInfo->isDot() || $fileInfo->isDir()) continue;
+
+					if (preg_match('/^cana(.*?)\.ini$/i',$fileInfo->getFilename())) {
+						$name = preg_replace('/^cana(\.?)(.*?)\.ini$/i','\\2',$fileInfo->getFilename());
+						$extensions[] = $name ? $name : 'cana';
+					}
+				}
+
+			} else {
+				$args = $this->args->args[1];
+				array_shift($args);
+				$extensions = $args;
+			}
+			$tmpBase = '/tmp/cana/';
+			$cmds = [
+				'rm -Rf '.$tmpBase,
+				'mkdir '.$tmpBase
+			];
+			foreach ($cmds as $cmd) {
+				exec($cmd);
+			}
+
+			foreach ($extensions as $extension) {
+				$this->updateExtension($extension, $path, $tmpBase);
+			}
+		}
+	}
+	
+	public function updateExtension($extension, $path, $tmpBase) {
+
+		$config = parse_ini_file($path.'/include/config/cana'.($extension == 'cana' ? '' : '.'.$extension).'.ini',true);
+		if (is_array($config)) {
+			foreach ($config as $key => $value) {
+				$pkg = $this->baseRepoPath.$key.'.git';
+				$tmpDir = $tmpBase.$key;
+
+				$cmds = [
+					'git clone '.$pkg.' '.$tmpDir,
+					'rm -Rf '.$tmpDir.'/.git',
+					'rm -f '.$tmpDir.'/.gitignore',
+					'rm -f '.$tmpDir.'/.gitconfig'
+				];
+				foreach ($cmds as $cmd) {
+					echo "Running $cmd \n";
+					exec($cmd);
+				}
+				
+				$pkgConfig = parse_ini_file($tmpDir.'/package.ini');
+				$installPath = $path.'/include/library/';
+				$readPath = $tmpDir.($pkgConfig['relpath'] ? '/'.$pkgConfig['relpath'] : '').'/';
+				
+				foreach ($pkgConfig['files'] as $file) {
+					// @todo: finish!
+					$p = $installPath.$file;
+					$p = explode('/',$p);
+					array_pop($p);
+					exec('mkdir -p '.implode('/',$p));
+					exec('cp -r '.$readPath.'/'.$file.' '.$installPath.$file);
+					echo 'Copied '.$readPath.'/'.$file.' to '.$installPath.$file."\n";
+				}
+			}
 		}
 	}
 
