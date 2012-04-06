@@ -369,30 +369,64 @@ class Cana_Utility {
 			if (!$path) {
 				echo "Couldnt find your cana path\n";
 			} else {
+			
 				$args = $this->args->args;
 				array_shift($args);
-				$to = array_pop($args);
 
-				$config = parse_ini_file($path.$package);
+				$tot = $args[count($args)-1];
+				if (is_dir($tot)) {
+					$to = array_pop($args);
+				}
+			
+				$extensions = [];
+				if (!$args[0] || $args == 'all') {
+					// update everything
+					foreach (new DirectoryIterator($path.'/include/config/') as $fileInfo) {
+						if ($fileInfo->isDot() || $fileInfo->isDir()) continue;
+	
+						if (preg_match('/^cana(.*?)\.ini$/i',$fileInfo->getFilename())) {
+							$name = preg_replace('/^cana(\.?)(.*?)\.ini$/i','\\2',$fileInfo->getFilename());
+							$extensions[] = $name ? $name : 'cana';
+						}
+					}
+	
+				} else {
 
-				if (!$to && $config['exportpath']) {
-					$to = $config['exportpath'];
+					$extensions = $args;
 				}
 				
-				foreach ($args as $arg) {
-					$this->exportPackage($path, '/include/config/cana'.($arg != 'cana' ? '.'.$arg : '').'.ini', $to, $config['files']);
+				print_r($extensions);
+
+			
+
+				foreach ($extensions as $arg) {
+					$this->exportPackage($path, '/include/config/cana'.($arg != 'cana' ? '.'.$arg : '').'.ini', $to);
 				}
 			}
 		}
 	}
 	
-	public function exportPackage($path, $package, $dst, $files) {
+	public function exportPackage($path, $package, $dst) {
 		if (file_exists($path.$package)) {
-			foreach ($files as $file) {
+			$config = parse_ini_file($path.$package, true);
 
-				exec('cp -r '.$path.'/include/library/'.$file.' '.$dst.'/'.$file);
-				echo 'Copied '.$path.'/include/library/'.$file.' to '.$dst.'/'.$file."\n";
+			$toit = (!$dst && $config['config']['exportpath']) ? $config['config']['exportpath'] : $dst;
+
+			foreach ($config as $key => $value) {
+
+				// nothing to do if we dont have files
+				if (!$value['files'])
+					continue;
+	
+				foreach ($value['files'] as $file) {
+					$p = explode('/',$toit.'/'.$file);
+					array_pop($p);
+					exec('mkdir -p '.implode('/',$p));
+					exec('cp -r '.$path.'/include/library/'.$file.' '.$toit.'/'.$file);
+				}
+			
 			}
+
 		}
 	}
 }
