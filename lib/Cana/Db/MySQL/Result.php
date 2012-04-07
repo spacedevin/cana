@@ -11,14 +11,6 @@
 class Cana_Db_MySQL_Result extends Cana_Db_Result {
 	public function numRows() {
 		return $this->db()->affected_rows;
-		/*
-		if (!isset($this->_num_rows)) {
-			$this->_num_rows = $this->db()->affected_rows;
-			// $num = count($this->fetch_all());
-			// $this->data_seek(0);
-		}
-		return $this->_num_rows;
-		*/
 	}
 
 	// do not pass this the mysql result!

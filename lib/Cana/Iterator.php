@@ -53,7 +53,6 @@ class Cana_Iterator implements Iterator {
 	private $_position;
 
 	public function __construct() {
-	
 		$items = [];
 		foreach (func_get_args() as $arg) {
 			if (is_object($arg) && (get_class($arg) == 'Cana_Iterator' || is_subclass_of($arg,'Cana_Iterator'))) {
@@ -68,6 +67,7 @@ class Cana_Iterator implements Iterator {
 		$this->_position = 0;
 	}
 	
+	// if anyone knows any way to pass func_get_args by reference i would love you. i want string manipulation
 	public static function o() {
 		$iterator = new ReflectionClass(get_called_class());
 		return $iterator->newInstanceArgs(func_get_args());
@@ -103,10 +103,11 @@ class Cana_Iterator implements Iterator {
 		return $this->_returnItems($items['yes']);
 	}
 	
-	public function each($func) {
+	public function each($func, $params = []) {
 		foreach ($this->_items as $key => $item) {
-			$f = Closure::bind($func, $item);
-			$f($key, $item);
+			$func = $func->bindTo(!is_object($item) ? (object)$item : $item);
+			$func($key, $item);
+			$this->_items[$key] = $item;
 		}
 	}
 	

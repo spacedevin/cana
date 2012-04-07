@@ -33,6 +33,7 @@ class Cana_Db_MySQL_Db extends mysqli {
 	public function query($query, $cache = true) {
 		if ($cache && Cana::config()->cache->mysql !== false && $cached = $this->cached($query)) {
 			$result = $cached;
+
 			$result->res()->data_seek(0);
 
 		} else {

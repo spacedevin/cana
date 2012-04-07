@@ -46,6 +46,7 @@ class Cana_Table extends Cana_Model { //
 	private $_fields;
 	private $_db;
 	private $_properties;
+	private $_jsonParsing = false;
 
 	/**
 	 * Retrieve a field list from the db
@@ -90,10 +91,12 @@ class Cana_Table extends Cana_Model { //
 			$node = (object)$id;
 		} else {
 			if ($id) {
-				$json = @json_decode($id);
-				if (is_object($json)) {
-					$node = $json;
-					$id = $node->{$this->idVar()};
+				if ($this->_jsonParsing) {
+					$json = @json_decode($id);
+					if (is_object($json)) {
+						$node = $json;
+						$id = $node->{$this->idVar()};
+					}
 				}
 
 				if (!$node) {
@@ -186,7 +189,7 @@ class Cana_Table extends Cana_Model { //
 		$this->dbWrite()->query($query);
 
 		if ($newItem == 1) {
-			$this->{$this->idVar()} = $this->dbWrite()->insert_id;
+			$this->{$this->idVar()} = $this->dbWrite()->insertId();
 		}
 		return $this;
 	}
@@ -347,6 +350,14 @@ class Cana_Table extends Cana_Model { //
 	
 	public function __toString() {
 		return print_r($this->properties(),1);
+	}
+	
+	public function dump() {
+		echo get_class()." Object (\n";
+		foreach ($this->properties() as $key => $value) {
+			echo '['.$key.'] => '.$value."\n";
+		}
+		echo ")\n";
 	}
 
 }	

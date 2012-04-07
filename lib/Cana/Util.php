@@ -43,19 +43,13 @@ class Cana_Util extends Cana_Model {
 			$bytes = $bytesIn;
 		}
 		
-		$pows = [
-			'p' => 5,
-			'pb' => 5,
-			't' => 4,
-			'tb' => 4,
-			'g' => 3,
-			'gb' => 3,
-			'm' => 2,
-			'mb' => 2,
-			'k' => 1,
-			'kb' => 1,
-		];
+		$lower = function($i) {
+			return strtolower(substr($i,0,1));
+		};
+		$from = $lower($from);
+		$to = $lower($to);
 
+		$pows = array_flip(['b','k','m','g','t','p']);
 		$bytes = $pows[$from] ? $bytes*(pow(1024,$pows[$from])) : $bytes;		
 		$bytes = $pows[$to] ? $bytes/(pow(1024,$pows[$to])) : $bytes;
 		return round($bytes,2);

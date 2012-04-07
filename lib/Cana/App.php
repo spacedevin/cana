@@ -36,7 +36,7 @@ class Cana_App extends Cana_Model {
 	public function init($params = null) {
 
 		if (!is_null($params['config'])) {
-			$this->_config = $params['config']->data();
+			$this->_config = $params['config'];
 		}
 		
 		// no host because its cli
@@ -45,21 +45,15 @@ class Cana_App extends Cana_Model {
 		}
 
 		$this->_env = isset($params['env']) ? $params['env'] : 'live';
-		$this->_config->db->active = $this->_config->db->{$this->_env};
-
-		// set up our constant definitions
-
-		$this->_constant = new Cana_Config('constant'.(isset($this->_config->appid) ? ('.'.$this->_config->appid) : ''),array('dir' => $this->_config->dirs->config));
 
 		// set up default timezone for strict data standards
 		date_default_timezone_set($this->_config->timezone);
 		
 		try {
-			$this->buildDb();
+			$this->buildDb($this->_env);
 		} catch (Exception $e) {
-			// add gracefull db error
-			echo 'DB ERROR';
-			print_r($e);
+			// @todo: add gracefull db error
+			echo 'Could not connect to the database';
 			exit;
 		}
 
@@ -126,8 +120,9 @@ class Cana_App extends Cana_Model {
 	/**
 	 * Set up the database connection
 	 */
-	public function buildDb() {
-		$connect = $this->_config->db->active;
+	public function buildDb($connection = 'live') {
+		$connect = $this->_config->db->{$connection};
+
 		if ($connect->encrypted) {
 			$connect->user = $this->crypt()->decrypt($connect->user);
 			$connect->pass = $this->crypt()->decrypt($connect->pass);
@@ -261,10 +256,6 @@ class Cana_App extends Cana_Model {
 	public function db() {
 		return $this->_db;
 	}
-	
-	public function dbWrite() {
-		return $this->_dbWrite ? $this->_dbWrite : $this->_db;
-	}
 
 	public function acl($acl = null) {
 		if (is_null($acl)) {
@@ -300,10 +291,6 @@ class Cana_App extends Cana_Model {
 			$this->_config = $config;
 			return $this;
 		}
-	} 
-	
-	public function constant() {
-		return $this->_constant;
 	}
 	
 	public function env() {
