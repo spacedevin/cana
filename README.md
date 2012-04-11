@@ -29,7 +29,7 @@ set a property on multiple objects and save them back to the db
 
 set multiple properties on an object an save it
 
-    Shot::o(DEV_DSM_000')->s([
+    Shot::o(DEV_DSM_000)->s([
         'date_due' => '2012-01-01',
         'id_deliv_group' => 'LUMA'
     ])->save();
