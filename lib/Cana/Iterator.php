@@ -218,7 +218,7 @@ class Cana_Iterator implements Iterator {
 	public function __toString() {
 		$print = '';
 		foreach ($this->_items as $key => $item) {
-			if (is_object($item) && method_exist($item,'__toString')) {
+			if (is_object($item) && method_exists($item,'__toString')) {
 				$print .= $item->__toString();
 			} elseif (is_string($item) || is_int($item)) {
 				$print .= $item;
@@ -226,7 +226,37 @@ class Cana_Iterator implements Iterator {
 		}
 		return $print;
 	}
+	
+	// export all available objects as a csv. asume that they are all table objects
+	// may not be the best place to put this but o well. exporting iterators is great.
+	public function csv() {
 
+		$fields = [];
+		foreach ($this->_items as $key => $item) {
+			if (is_object($item) && method_exists($item,'csv')) {
+				foreach ($item->csv() as $field => $value) {
+					$fields[$field] = $field;
+				}
+			}
+		}
+		$output = '';
+		foreach ($fields as $field) {
+			$output .= ($output ? ',' : '').$field;
+		}
+		$output .= "\n";
+		foreach ($this->_items as $key => $item) {
+			if (is_object($item) && method_exists($item,'csv')) {
+				$o = $item->csv();
+				foreach ($fields as $field) {
+					$output .= '"'.addslashes($o[$field]).'",';
+				}
+				$output = substr($output,0,-1);
+				$output .= "\n";
+			}
+		}
+		return $output;
+		
+	}
 	
 	public function __call($name, $arguments) {
 		foreach ($this->_items as $key => $item) {
