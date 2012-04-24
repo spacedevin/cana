@@ -348,6 +348,14 @@ class Cana_Table extends Cana_Model { //
 		return json_encode($this->properties());
 	}
 	
+	public function csv() {
+		$csv = $this->properties();
+		if ($this->idVar() != 'id') {
+			unset($csv['id']);
+		}
+		return $csv;
+	}
+	
 	public function __toString() {
 		return print_r($this->properties(),1);
 	}
