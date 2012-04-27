@@ -8,20 +8,21 @@
  *
  */
 
-class Cana_File extends Cana_Table {
+class Cana_File extends Cana_Model {
 
 	private $_file;
 
-	public function __construct($file) {
-		parent::__construct();
-		$this->_file = Cana_File::cleanFileName($file);
-		$this->_path = Cana::config()->dirs->root.'storage/';
+	public function __construct($params) {
+		$this->_file = self::cleanFileName($params['file']);
+		$this->_path = $params['path'];
+		$this->_name = $params['name'] ? $params['name'] : $params['file'];
 	}
 	
 
 	public function get($attachment = false, $resume = true, $filename = null) {
 	
 		$file = $this->_path.$this->_file;
+		$filename = $filename ? $filename : $this->_name;
 
 		if (!file_exists($file)) {
 			header('HTTP/1.1 404 Not Found');
