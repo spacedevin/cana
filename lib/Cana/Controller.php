@@ -13,6 +13,7 @@
 
 
 class Cana_Controller extends Cana_Model {
-    
+    public function __construct() {
 
+    }
 } 
