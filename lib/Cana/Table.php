@@ -345,7 +345,11 @@ class Cana_Table extends Cana_Model { //
 	}
 	
 	public function json() {
-		return json_encode($this->properties());
+		return json_encode($this->exports());
+	}
+	
+	public function exports() {
+		return $this->properties();
 	}
 	
 	public function csv() {

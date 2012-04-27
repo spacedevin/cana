@@ -34,6 +34,8 @@ class Cana_Model {
 		if (is_callable($func)) {
 			array_unshift($arguments,$this);
 			return call_user_func_array($func, $arguments);
+		} else {
+			throw new Exception(get_called_class().' has no method '.$name);
 		}
 	}
 

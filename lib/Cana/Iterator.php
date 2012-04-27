@@ -137,7 +137,10 @@ class Cana_Iterator implements Iterator {
 	
 	public function json() {
 		foreach ($this->_items as $key => $item) {
-			$items[$key] = $item->properties();
+			if (is_callable($item, 'exports') || method_exists($item, 'exports')) {
+				$items[$key] = (new ReflectionMethod($item, 'exports'))->invokeArgs($item, []);
+			}
+			$items[$key] = $item->exports();
 		}
 		return json_encode($items);
 	}
