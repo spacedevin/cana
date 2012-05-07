@@ -333,7 +333,21 @@ class Cana_Table extends Cana_Model { //
 		}
 		return $this;
 	}
+	
+	public static function l($list) {
+		$list = Cana_Model::l2a($list);
+		$classname = get_called_class();
 
+		foreach ($list as $arg) {
+			$items[] = Cana::factory($classname,$arg);
+		}
+
+		if (count($items) == 1) {
+			return array_pop($items);
+		} else {
+			return new Cana_Iterator($items);
+		}
+	}
 	
 	public static function q($query) {
 		$res = Cana::db()->query($query);

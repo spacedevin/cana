@@ -38,6 +38,16 @@ class Cana_Model {
 			throw new Exception(get_called_class().' has no method '.$name);
 		}
 	}
+	
+	public static function l2a($list) {
+		$list = explode("\n",$list);
+		foreach ($list as $item) {
+			$item = trim($item);
+			if (!$item) continue;
+			$items[] = $item;
+		}
+		return $items;
+	}
 
     /**
 	 * Converts an array into a model
