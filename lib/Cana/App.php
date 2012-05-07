@@ -209,6 +209,13 @@ class Cana_App extends Cana_Model {
 
 		return $this;
 	}
+	
+	public function includeFileError($pageClass) {
+		$this->view->headers->http[] = array(
+			'value'		=> 'HTTP/1.0 404 Not Found'
+		);
+		$this->view()->display('error/404');
+	}
 
 	
 	public function includeFile($pageClass) {
@@ -233,7 +240,7 @@ class Cana_App extends Cana_Model {
 
 
 		if (!isset($this->_page->fileName) || !file_exists($this->_page->fileName)) {
-			$this->displayPage('error');
+			$this->includeFileError($pageClass);
 		} else {
 			require_once $this->_page->fileName;
 		}
@@ -337,6 +344,10 @@ class Cana_App extends Cana_Model {
 			$this->_extended[$class][$name] = $func;
 		}
 		return $this->_extended[$class][$name];
+	}
+	
+	public function dbWrite() {
+		return $this->db();
 	}
 
 }
