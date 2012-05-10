@@ -231,7 +231,7 @@ class Cana_Table extends Cana_Model { //
 		}
 		return $this;
 	}
-	
+
 	public function __construct($db = null) {
 		if (is_null($db)) {
 			$this->db(Cana::db());
@@ -249,7 +249,7 @@ class Cana_Table extends Cana_Model { //
 		}
 		return $newTable;
 	}
-	
+
 	public function db($db = null) {
 		if (is_null($db)) {
 			return $this->_db ? $this->_db : Cana::db();
@@ -258,7 +258,7 @@ class Cana_Table extends Cana_Model { //
 			return $this;
 		}
 	}
-	
+
 	public function dbWrite() {
 		return Cana::dbWrite() ? Cana::dbWrite() : $this->db();
 	}
@@ -271,7 +271,7 @@ class Cana_Table extends Cana_Model { //
 			return $this;
 		}
 	}
-	
+
 	public function table($table = null) {
 		if (is_null($table)) {
 			return $this->_table;
@@ -280,15 +280,15 @@ class Cana_Table extends Cana_Model { //
 			return $this;
 		}
 	}
-	
+
 	public function properties() {
 		return $this->_properties;
 	}
-	
+
 	public function property($name) {
 		return isset($this->_properties[$name]) ? $this->_properties[$name] : null;
 	}
-	
+
 	public function &__get($name) {
 		if (isset($name{0}) && $name{0} == '_') {
 			return $this->{$name};
@@ -296,7 +296,7 @@ class Cana_Table extends Cana_Model { //
 			return $this->_properties[$name];
 		}
 	}
-	
+
 	public function __set($name, $value) {
 		if ($name{0} == '_') {
 			return $this->{$name} = $value;
@@ -312,7 +312,13 @@ class Cana_Table extends Cana_Model { //
 	public static function o() {
 		$classname = get_called_class();
 		foreach (func_get_args() as $arg) {
-			$items[] = Cana::factory($classname,$arg);
+			if (is_array($arg)) {
+				foreach ($arg as $item) {
+					$items[] = Cana::factory($classname,$item);
+				}
+			} else {
+				$items[] = Cana::factory($classname,$arg);
+			}
 		}
 
 		if (count($items) == 1) {
@@ -336,17 +342,12 @@ class Cana_Table extends Cana_Model { //
 	
 	public static function l($list) {
 		$list = Cana_Model::l2a($list);
-		$classname = get_called_class();
-
-		foreach ($list as $arg) {
-			$items[] = Cana::factory($classname,$arg);
-		}
-
-		if (count($items) == 1) {
-			return array_pop($items);
-		} else {
-			return new Cana_Iterator($items);
-		}
+		return self::o($list);
+	}
+	
+	public static function c($list) {
+		$list = Cana_Model::l2a($list, ',');
+		return self::o($list);
 	}
 	
 	public static function q($query) {
