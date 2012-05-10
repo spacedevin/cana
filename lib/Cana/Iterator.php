@@ -86,9 +86,14 @@ class Cana_Iterator implements Iterator {
 		return $this->_items[$pos];
 	}
 	
+	public function remove($start) {
+		unset($this->_items[$start]);
+		return $this;
+	}
+	
 	public function slice($start, $end = null) {
 		$items = $this->_items;
-		$items = array_slice($start, $end);
+		$items = array_slice($items, $start, $end);
 
 		return $this->_returnItems($items);
 	}
@@ -268,10 +273,9 @@ class Cana_Iterator implements Iterator {
 			} else {
 				// not callable
 			}
-			return i::o($items);
 		}
 
-		return $this;
+		return i::o($items);
 	}
 
 	public function &__get($name) {
