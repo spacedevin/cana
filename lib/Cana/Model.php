@@ -39,8 +39,8 @@ class Cana_Model {
 		}
 	}
 	
-	public static function l2a($list) {
-		$list = explode("\n",$list);
+	public static function l2a($list,$sep = "\n") {
+		$list = explode($sep,$list);
 		foreach ($list as $item) {
 			$item = trim($item);
 			if (!$item) continue;
