@@ -49,12 +49,6 @@ class Cana_App extends Cana_Model {
 		// set up default timezone for strict data standards
 		date_default_timezone_set($this->_config->timezone);
 
-		//try {
-			$this->_db = $this->buildDb($this->_env);
-		//} catch (Exception $e) {
-			//throw new Cana_Exception('Could not connect to the database');
-		//}
-
 		if (!isset($params['postInitSkip'])) {
 			$this->postInit($params);
 		}
@@ -261,7 +255,7 @@ class Cana_App extends Cana_Model {
 	 */
 	public function db() {
 		if (!$this->_db) {
-			$this->buildDb($this->_env);
+			$this->_db = $this->buildDb($this->env());
 		}
 		return $this->_db;
 	}
