@@ -21,9 +21,7 @@ class App_App extends Cana_App {
 
 		$config = $this->config();
 
-
 		$this->config($config);
-
 
 		$this
 			->config($config)
