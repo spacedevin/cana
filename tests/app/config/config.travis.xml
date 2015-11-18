@@ -6,9 +6,9 @@
 	<db>
 		<local>
 			<user>root</user>
-			<pass>root</pass>
+			<pass></pass>
 			<db>cana</db>
-			<host>127.0.0.1</host>
+			<host>localhost</host>
 			<prefix></prefix>
 		</local>
 	</db>

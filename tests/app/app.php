@@ -84,7 +84,9 @@ if (!$_REQUEST['__url']) {
 }
 
 
-if (file_exists($GLOBALS['config']['dirs']['config'].'config.xml')) {
+if (getenv('TRAVIS')) {
+	$configFile = $GLOBALS['config']['dirs']['config'].'config.travis.xml';
+} elseif (file_exists($GLOBALS['config']['dirs']['config'].'config.xml')) {
 	$configFile = $GLOBALS['config']['dirs']['config'].'config.xml';
 }
 
