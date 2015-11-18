@@ -104,7 +104,7 @@ class Cana_App extends Cana_Model {
 		} else {
 			$this->pages([]);
 		}
-		
+
 		$this->view()->pages = $this->pages();
 		$this->config()->controllerStack[] = $this->config()->defaults->version;
 
@@ -260,6 +260,9 @@ class Cana_App extends Cana_Model {
 	 * Accessor methods
 	 */
 	public function db() {
+		if (!$this->_db) {
+			$this->buildDb($this->_env);
+		}
 		return $this->_db;
 	}
 
