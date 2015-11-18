@@ -1,0 +1,29 @@
+{
+	"name": "arzynik/cana",
+	"description": "PHP OO Framework",
+	"license": "MIT",
+	"time": "2012-03-28",
+	"keywords": [
+		"php",
+		"oo",
+		"mvc",
+		"framework"
+	],
+	"authors": [
+		{
+			"name": "Devin Smith",
+			"email": "devin@cana.la",
+			"homepage": "http://devin.la",
+			"role": "Developer"
+		}
+	],
+	"minimum-stability": "stable",
+	"require": {
+		"php": ">=5.4.0"
+	}
+	"autoload": {
+		"psr-0": {
+			"Cana": "src/"
+		}
+	}
+}
