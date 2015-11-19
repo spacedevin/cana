@@ -147,7 +147,7 @@ class Cana extends Cana_Model {
 	}
 
 	public static function timeout($func, $ms = null, $async = true, $forceEnv = false) {
-		$closure = new SuperClosure($func);
+		$closure = new Cana_SuperClosure($func);
 		$encoded = base64_encode(serialize($closure));
 
 		if ($ms) {
