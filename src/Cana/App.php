@@ -351,7 +351,7 @@ class Cana_App extends Cana_Model {
 
 	public function cache() {
 		if (!isset($this->_cache)) {
-			$this->_cache = new Cache( $this->config()->cache->default );
+			$this->_cache = new Cana_Cache( $this->config()->cache->default );
 		}
 		return $this->_cache;
 	}
