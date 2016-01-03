@@ -11,7 +11,7 @@
 class Cana_Util extends Cana_Model {
 
 	public static function gitVersion() {
-		$v = @file_get_contents(Cana::config()->dirs->root.'.git/ORIG_HEAD');
+		$v = shell_exec('cd '.Cana::config()->dirs->root.' && git rev-parse HEAD');
 		return trim($v);
 	}
 
